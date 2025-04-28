@@ -1,6 +1,8 @@
 package com.nickfanelli;
 
 import com.nickfanelli.graphics.Window;
+import com.nickfanelli.render.SpriteRenderer;
+import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -10,10 +12,16 @@ public class Application {
     private Window window = null;
     private int currentFps = 0;
 
+    private SpriteRenderer spriteRenderer;
+
     public void startApplication() {
 
-        this.window = new Window("Terraria Clone", 1200, 800);
+        this.window = new Window("Terraria Clone", 1280, 720);
         this.window.createWindowContext();
+
+        this.spriteRenderer = new SpriteRenderer();
+        this.spriteRenderer.initializeRenderer();
+        this.spriteRenderer.registerQuad();
 
         this.startUpdateLoop();
 
@@ -35,7 +43,7 @@ public class Application {
             glClear(GL_COLOR_BUFFER_BIT);
 
             if(deltaTime >= 0) {
-                // Update Here
+                this.update();
             }
 
             glfwSwapBuffers(windowPtr);
@@ -57,6 +65,26 @@ public class Application {
         }
 
         this.cleanUpApplication();
+
+    }
+
+    private void update() {
+
+//        glBegin(GL_TRIANGLES);
+//
+//        glColor3f(1.0f, 0.0f, 0.0f); // Red
+//        glVertex2f(-0.5f, -0.5f);     // Top vertex
+//
+//        glColor3f(0.0f, 1.0f, 0.0f); // Green
+//        glVertex2f(0.5f, -0.5f);  // Bottom-left vertex
+//
+//        glColor3f(0.0f, 0.0f, 1.0f); // Blue
+//        glVertex2f(0.0f, 0.5f);   // Bottom-right vertex
+//
+//
+//        glEnd();
+
+        this.spriteRenderer.render();
 
     }
 

@@ -1,6 +1,7 @@
 package com.nickfanelli.graphics;
 
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
@@ -14,16 +15,22 @@ import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
 public class Window {
 
     private final String windowTitle;
-    private final int windowWidth;
-    private final int windowHeight;
+
+    private int windowWidth;
+    private int windowHeight;
+    private int aspectRatio;
+
+    private GLFWWindowSizeCallback windowSizeCallback;
 
     private long windowPtr = MemoryUtil.NULL;
 
     public Window(String windowTitle, int windowWidth, int windowHeight) {
 
         this.windowTitle = windowTitle;
+
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
+        this.aspectRatio = windowWidth / windowHeight;
 
     }
 
@@ -34,6 +41,11 @@ public class Window {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_SAMPLES, 4);
+
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         this.windowPtr = glfwCreateWindow(this.windowWidth, this.windowHeight, this.windowTitle, MemoryUtil.NULL, MemoryUtil.NULL);
 
@@ -73,10 +85,18 @@ public class Window {
             );
         } // the stack frame is popped automatically
 
+        glfwSetWindowSizeCallback(this.windowPtr, (window, width, height) -> {
+
+            this.windowWidth = width;
+            this.windowHeight = height;
+            this.aspectRatio = width / height;
+
+            glViewport(0, 0, width, height);
+
+        });
+
         // Make the OpenGL context current
         glfwMakeContextCurrent(this.windowPtr);
-
-        glfwWindowHint(GLFW_SAMPLES, 4);
 
         // Enable v-sync
         glfwSwapInterval(1);
@@ -100,7 +120,7 @@ public class Window {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+        glViewport(0, 0, this.windowWidth, this.windowHeight);
 
     }
 
